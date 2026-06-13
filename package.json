@@ -7,13 +7,15 @@
     "start": "vite",
     "build": "vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "serve": "^14.2.4",
+    "typescript": "^5.4.5",
     "vite": "^5.2.10"
   }
 }

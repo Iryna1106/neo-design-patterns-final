@@ -1,16 +1,23 @@
 import { ResumeImporter } from "../importer/ResumeImporter";
 
 /**
- * Фасад: єдина точка входу.
+ * Патерн Facade (Фасад).
+ *
+ * Єдина спрощена точка входу, що приховує складність процесу:
+ * завантаження JSON → валідація → мапінг → рендеринг у DOM.
+ * Зовнішній код викликає лише `init(jsonPath)`.
  */
 export class ResumePage {
   async init(jsonPath: string): Promise<void> {
-    // TODO: Завантажити дані через fetchData
-    // TODO: Імпортувати дані через ResumeImporter
+    const raw = await this.fetchData(jsonPath);
+    new ResumeImporter(raw).import();
   }
 
   private async fetchData(path: string): Promise<unknown> {
-    // TODO: Завантажити JSON з вказаного шляху
-    return {};
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error(`Не вдалося завантажити ${path}: ${response.status}`);
+    }
+    return response.json();
   }
 }

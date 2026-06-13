@@ -1,5 +1,5 @@
 /**
- * Блок відображення навичок резюме
+ * Блок відображення навичок, згрупованих за категоріями.
  */
 
 import { Skills } from "../models/ResumeModel";
@@ -8,22 +8,21 @@ import { IBlock } from "./BlockFactory";
 export class SkillsBlock implements IBlock {
   constructor(private d: Skills) {}
 
-  /**
-   * Рендеринг блоку навичок
-   *
-   * TODO: Реалізуйте метод для відображення категорій навичок
-   * та їх списків у вигляді HTML елементів
-   */
   render(): HTMLElement {
-    // Створюємо секцію
     const sec = document.createElement("section");
     sec.className = "section skills";
     sec.innerHTML = "<h2>Skills</h2>";
 
-    // TODO: Створіть список навичок, згрупований за категоріями
-    // Використайте Object.entries(this.d) для ітерації по всіх категоріях
-    // Створіть для кожної категорії елемент списку з назвою категорії та списком навичок
+    const ul = document.createElement("ul");
+    ul.className = "skills-list";
 
+    for (const [category, items] of Object.entries(this.d)) {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${category}:</strong> ${items.join(", ")}`;
+      ul.appendChild(li);
+    }
+
+    sec.appendChild(ul);
     return sec;
   }
 }

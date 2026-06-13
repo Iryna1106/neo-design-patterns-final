@@ -1,41 +1,57 @@
 /**
- * Конкретна реалізація імпортера резюме
- * Наслідується від AbstractImporter і реалізує абстрактні методи
+ * Конкретна реалізація імпортера резюме.
+ * Наслідується від AbstractImporter (Template Method) і реалізує кроки
+ * validate → map → render.
  */
 
 import { AbstractImporter } from "./AbstractImporter";
 import { ResumeModel } from "../models/ResumeModel";
-import { BlockFactory } from "../blocks/BlockFactory";
+import { BlockFactory, BlockType } from "../blocks/BlockFactory";
+
+const REQUIRED_BLOCKS = [
+  "header",
+  "summary",
+  "experience",
+  "education",
+  "skills",
+] as const;
 
 export class ResumeImporter extends AbstractImporter<ResumeModel> {
-  /**
-   * Перевіряє, чи відповідає JSON-об'єкт очікуваній структурі
-   *
-   * TODO: Реалізуйте валідацію JSON-даних резюме.
-   * Перевірте наявність необхідних полів (header, summary, experience, education, skills)
-   */
+  /** Перевіряє наявність усіх обов'язкових блоків. */
   protected validate(): void {
-    // TODO: Додайте перевірки на наявність обов'язкових полів та їх структуру. Неприпустимий формат JSON
+    const data = this.raw;
+    if (!data || typeof data !== "object") {
+      throw new Error("Неприпустимий формат JSON: очікується об'єкт");
+    }
+    const obj = data as Record<string, unknown>;
+    for (const key of REQUIRED_BLOCKS) {
+      if (obj[key] == null) {
+        throw new Error(`Відсутній обов'язковий блок: ${key}`);
+      }
+    }
   }
 
-  /**
-   * Перетворює JSON-дані у внутрішню модель резюме
-   *
-   */
+  /** Перетворює «сирий» JSON на внутрішню модель. */
   protected map(): ResumeModel {
     return this.raw as ResumeModel;
   }
 
-  /**
-   * Рендерить модель резюме у DOM
-   *
-   * TODO: Реалізуйте рендеринг моделі у DOM-дерево
-   */
+  /** Створює блоки через фабрику і додає їх у #resume-content. */
   protected render(model: ResumeModel): void {
     const root = document.getElementById("resume-content")!;
-    // TODO: Створіть фабрику і використайте її для створення і рендерингу блоків
-    const factory = new BlockFactory();
+    root.innerHTML = "";
 
-    // TODO: Створіть і додайте у DOM кожен блок резюме
+    const factory = new BlockFactory();
+    const order: BlockType[] = [
+      "header",
+      "summary",
+      "experience",
+      "education",
+      "skills",
+    ];
+
+    for (const type of order) {
+      root.appendChild(factory.createBlock(type, model).render());
+    }
   }
 }
